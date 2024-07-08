@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebXR VR Example with A-Frame</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/wmurphyrd/aframe-super-hands-component/dist/aframe-super-hands.min.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <!-- Sky background -->
+      <a-sky color="#ECECEC"></a-sky>
+
+      <!-- Floor -->
+      <a-plane
+        position="0 0 -4"
+        rotation="-90 0 0"
+        width="10"
+        height="10"
+        color="#7BC8A4"
+      ></a-plane>
+
+      <!-- Red box -->
+      <a-box
+        position="-1 0.5 -3"
+        rotation="0 45 0"
+        width="0.5"
+        height="0.5"
+        depth="0.5"
+        color="#FF0000"
+        grabbable
+        stretchable
+        draggable
+      ></a-box>
+
+      <!-- Green box that changes color when clicked -->
+      <a-box
+        id="greenBox"
+        position="1 0.5 -3"
+        rotation="0 45 0"
+        width="0.5"
+        height="0.5"
+        depth="0.5"
+        color="#00FF00"
+        grabbable
+        stretchable
+        draggable
+      ></a-box>
+
+      <!-- Camera -->
+      <a-entity camera look-controls position="0 1.6 0"></a-entity>
+
+      <!-- VR Controllers -->
+      <a-entity laser-controls="hand: right" super-hands></a-entity>
+      <a-entity laser-controls="hand: left" super-hands></a-entity>
+    </a-scene>
+
+    <script>
+      // Add event listener to the green box for interaction
+      document.querySelector('#greenBox').addEventListener('click', function () {
+        this.setAttribute('color', '#0000FF');
+      });
+    </script>
+  </body>
+</html>
