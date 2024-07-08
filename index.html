@@ -3,52 +3,58 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WebXR VR Example with A-Frame</title>
+    <title>WebXR AR Example with A-Frame</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.7.2/aframe/build/aframe-ar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/wmurphyrd/aframe-super-hands-component/dist/aframe-super-hands.min.js"></script>
   </head>
-  <body>
-    <a-scene>
-      <!-- Sky background -->
-      <a-sky color="#ECECEC"></a-sky>
-
-      <!-- Floor -->
-      <a-plane
-        position="0 0 -4"
-        rotation="-90 0 0"
-        width="10"
-        height="10"
-        color="#7BC8A4"
-      ></a-plane>
-
-      <!-- Red box -->
-      <a-box
-        position="-1 0.5 -3"
-        rotation="0 45 0"
-        width="0.5"
-        height="0.5"
-        depth="0.5"
-        color="#FF0000"
-      ></a-box>
-
-      <!-- Green box that changes color when clicked -->
-      <a-box
-        id="greenBox"
-        position="1 0.5 -3"
-        rotation="0 45 0"
-        width="0.5"
-        height="0.5"
-        depth="0.5"
-        color="#00FF00"
-      ></a-box>
-
-      <!-- Camera -->
-      <a-entity camera look-controls position="0 1.6 0"></a-entity>
+  <body style="margin: 0; overflow: hidden;">
+    <a-scene embedded arjs>
+      <!-- AR marker -->
+      <a-marker preset="hiro">
+        <a-entity id="shapesContainer"></a-entity>
+      </a-marker>
+      <a-entity camera></a-entity>
     </a-scene>
 
+    <!-- Button to add shapes -->
+    <button id="addShapeButton" style="position: fixed; top: 10px; left: 10px; z-index: 100;">
+      Add Shape
+    </button>
+
     <script>
-      // Add event listener to the green box for interaction
-      document.querySelector('#greenBox').addEventListener('click', function () {
-        this.setAttribute('color', '#0000FF');
+      document.getElementById('addShapeButton').addEventListener('click', () => {
+        const container = document.getElementById('shapesContainer');
+        const shape = document.createElement('a-box');
+        shape.setAttribute('position', `${Math.random() * 2 - 1} 0.5 ${Math.random() * 2 - 1}`);
+        shape.setAttribute('width', '0.5');
+        shape.setAttribute('height', '0.5');
+        shape.setAttribute('depth', '0.5');
+        shape.setAttribute('color', '#' + Math.floor(Math.random() * 16777215).toString(16));
+        shape.setAttribute('grabbable', '');
+        shape.setAttribute('stretchable', '');
+        shape.setAttribute('draggable', '');
+        container.appendChild(shape);
+      });
+
+      AFRAME.registerComponent('grabbable', {
+        init: function () {
+          this.el.addEventListener('mousedown', (e) => {
+            this.isDragging = true;
+            this.dragOffset = e.detail.intersection.point.clone().sub(this.el.object3D.position);
+          });
+
+          this.el.addEventListener('mouseup', () => {
+            this.isDragging = false;
+          });
+
+          this.el.addEventListener('mousemove', (e) => {
+            if (this.isDragging) {
+              const newPosition = e.detail.intersection.point.clone().sub(this.dragOffset);
+              this.el.object3D.position.copy(newPosition);
+            }
+          });
+        },
       });
     </script>
   </body>
